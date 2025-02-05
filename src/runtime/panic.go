@@ -1111,6 +1111,10 @@ func fatalthrow(t throwType) {
 	sp := getcallersp()
 	gp := getg()
 
+	if canGoExit(gp, pc, sp) {
+		goexit1()
+	}
+
 	if gp.m.throwing == throwTypeNone {
 		gp.m.throwing = t
 	}
@@ -1146,6 +1150,11 @@ func fatalpanic(msgs *_panic) {
 	pc := getcallerpc()
 	sp := getcallersp()
 	gp := getg()
+
+	if canGoExit(gp, pc, sp) {
+		goexit1()
+	}
+
 	var docrash bool
 	// Switch to the system stack to avoid any stack growth, which
 	// may make things worse if the runtime is in a bad state.
